@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .search-container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .search-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .search-container input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-container input[type="text"]:focus {
+            border-color: #4285f4;
+        }
+        .search-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4285f4;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-container button:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h1>BookFinder</h1>
+        <form method="POST" action="{% url 'search_books' %}">
+            {% csrf_token %}
+            <input type="text" name="q" placeholder="Enter search query">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+</body>
+</html>
