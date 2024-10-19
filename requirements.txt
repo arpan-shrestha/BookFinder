@@ -1,0 +1,13 @@
+asgiref==3.8.1
+charset-normalizer==3.3.2
+click==8.1.7
+Django==5.1.1
+joblib==1.4.2
+nltk==3.9.1
+numpy==2.1.1
+pillow==10.4.0
+regex==2024.9.11
+scikit-learn==1.5.2
+scipy==1.14.1
+sqlparse==0.5.1
+threadpoolctl==3.5.0
