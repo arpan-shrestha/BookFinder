@@ -6,7 +6,9 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
 from sklearn.metrics.pairwise import cosine_similarity
+from concurrent.futures import ThreadPoolExecutor
 import nltk
+from .models import Book
 
 # Make sure to download NLTK data files if you haven't already
 nltk.download('punkt')
@@ -19,7 +21,7 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
 # Path where text files are stored
-txt_path = os.path.join(settings.BASE_DIR, 'pdfs')
+txt_path = os.path.join(settings.BASE_DIR, 'corpus')
 
 # Text preprocessing components
 lemmatizer = WordNetLemmatizer()
@@ -47,32 +49,44 @@ def inverse_document_frequency(term, all_documents):
         return 0
     return math.log(len(all_documents) / num_docs_containing_term)
 
+# Function to read and preprocess a single document (for threading)
+def read_and_preprocess_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
+    processed_text = preprocess(text)
+    return processed_text
+
 
 # View to handle the search query and return ranked results
 def search_books(request):
     if request.method == "GET":
-        # Show the search page with an empty form when the page is loaded
         return render(request, 'search.html')
     
     elif request.method == "POST":
-        # Process the query once submitted
         query = request.POST.get('q', '')  # Capture the search query
         results = []
 
         if query:
             processed_query = preprocess(query)
 
-            # Process all documents (text files) in the directory
+            # Multi-threaded document processing
             documents = []
             filenames = []
-            for filename in os.listdir(txt_path):
-                if filename.endswith(".txt"):
-                    file_path = os.path.join(txt_path, filename)
-                    with open(file_path, 'r', encoding='utf-8') as file:
-                        text = file.read()
-                    processed_text = preprocess(text)
-                    documents.append(processed_text)
-                    filenames.append(filename)
+
+            with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+                future_to_filename = {
+                    executor.submit(read_and_preprocess_file, os.path.join(txt_path, filename)): filename
+                    for filename in os.listdir(txt_path) if filename.endswith(".txt")
+                }
+
+                for future in future_to_filename:
+                    filename = future_to_filename[future]
+                    try:
+                        processed_text = future.result()
+                        documents.append(processed_text)
+                        filenames.append(filename)
+                    except Exception as e:
+                        print(f"Error processing file {filename}: {e}")
 
             all_terms = set([term for doc in documents for term in doc]).union(set(processed_query))
 
@@ -100,9 +114,25 @@ def search_books(request):
             cosine_similarities = cosine_similarity(tfidf_query, tfidf_documents).flatten()
             ranked_results = sorted(zip(filenames, cosine_similarities), key=lambda x: x[1], reverse=True)
 
-            results = ranked_results
+            # Retrieve author names and book covers from the database
+            results = []
+            for filename, similarity in ranked_results:
+                try:
+                    # Fetch book data from the database using the filename
+                    book = Book.objects.get(filename=filename)
+                    results.append({
+                        'filename': filename,
+                        'similarity': similarity,
+                        'author_name': book.author_name,
+                        'book_cover': book.book_cover.url if book.book_cover else None,
+                    })
+                except Book.DoesNotExist:
+                    # Handle the case where the book is not found in the database
+                    results.append({
+                        'filename': filename,
+                        'similarity': similarity,
+                        'author_name': 'Unknown Author',
+                        'book_cover': None,
+                    })
 
-        # After processing the search query, show the results in search_results.html
         return render(request, 'search_results.html', {"query": query, "results": results})
-
-

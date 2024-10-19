@@ -1,22 +1,118 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
+    <style>
+        /* Basic page styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Header styling */
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Container for the list of results */
+        .results-container {
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Individual result item styling */
+        .result-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Book cover image styling */
+        .book-cover {
+            width: 100px;
+            height: 150px;
+            margin-right: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        /* Book details styling */
+        .book-details {
+            flex: 1;
+        }
+
+        .book-details strong {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .book-details span {
+            display: block;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        /* Back to home button styling */
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Search Results for "{{ query }}"</h1>
-
-    {% if results %}
-        <ul>
-        {% for filename, similarity in results %}
-            <li>{{ filename }} - Similarity Score: {{ similarity }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No results found.</p>
-    {% endif %}
+    <h2>Search Results for "{{ query }}"</h2>
     
+    <div class="results-container">
+        {% if results %}
+            {% for result in results %}
+                <div class="result-item">
+                    {% if result.book_cover %}
+                        <img src="{{ result.book_cover }}" alt="Book Cover" class="book-cover">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="No Cover Available" class="book-cover">
+                    {% endif %}
+                    <div class="book-details">
+                        <strong>{{ result.filename }}</strong>
+                        <span><strong>Author:</strong> {{ result.author_name }}</span>
+                        <span><strong>Cosine Similarity:</strong> {{ result.similarity }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No results found. Try a different search query.</p>
+        {% endif %}
+    </div>
+
+    <button class="back-button" onclick="window.location.href='/'">Go Back to Home</button>
 </body>
 </html>
