@@ -147,16 +147,9 @@
             List of Corpos
             <div class="dropdown">
                 <ul>
-                    <li>A Room with a View</li>
-                    <li>Alice's Adventures in Wonderland</li>
-                    <li>Cranford</li>
-                    <li>Little Women; Or, Meg, Jo, Beth, and Amy</li>
-                    <li>The Adventures of Ferdinand Count Fathom </li>
-                    <li>The Adventures of Roderick Random</li>
-                    <li>The Blue Castle; a novel</li>
-                    <li>The Complete Works of William Shakespeare</li>
-                    <li>The Enchanted April</li>
-                    <li>The Expedition of Humphry Clinker</li>
+                    {% for book in books%}
+                    <li>{{ book.filename }} by {{ book.author_name}}</li>
+                    {% endfor%}
                 </ul>
             </div>
         </div>

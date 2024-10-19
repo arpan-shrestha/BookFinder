@@ -60,7 +60,8 @@ def read_and_preprocess_file(file_path):
 # View to handle the search query and return ranked results
 def search_books(request):
     if request.method == "GET":
-        return render(request, 'search.html')
+        books = Book.objects.all()
+        return render(request, 'search.html', {'books':books})
     
     elif request.method == "POST":
         query = request.POST.get('q', '')  # Capture the search query
