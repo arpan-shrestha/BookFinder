@@ -19,3 +19,7 @@ A Django-based document retrieval system that ranks books using a Vector Space M
 <img width="463" alt="Screenshot 2024-10-18 at 10 00 48 PM" src="https://github.com/user-attachments/assets/a91741c1-df28-4150-81ff-2161e1f04e0b">
 <img width="463" alt="Screenshot 2024-10-18 at 10 00 13 PM" src="https://github.com/user-attachments/assets/eaa337d5-bf77-4c32-84ef-57352cca00e5">
 <img width="445" alt="Screenshot 2024-10-18 at 10 00 24 PM" src="https://github.com/user-attachments/assets/bf51dcbf-230d-4be5-b92e-9f7510cfed01">
+
+## Demo Video
+https://github.com/user-attachments/assets/248ad934-f21a-44cd-9043-ed53334b2dde
+
